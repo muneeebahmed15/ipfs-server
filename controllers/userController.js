@@ -9,9 +9,9 @@ const jwt = require("jsonwebtoken");
 
 const registerUser = asyncHandler(async(req,res) => {
     console.log("Request received at /users/signup");
-const {username, password, email} = req.body;
+const {adminname,username, email, password} = req.body;
 console.log("Received data: ",req.body);
-if(!username || !email || !password){
+if(!adminname || !username || !email || !password){
     res.status(400);
     throw new Error("All field are manadatory!");
 }
@@ -27,6 +27,7 @@ if(userAvailable)
 const hashedPassword = await bcrypt.hash(password,10);
 console.log("hashpassword", hashedPassword);
 const user = await User.create({
+    adminname,
     username,
     email, 
     password : hashedPassword,
@@ -47,12 +48,12 @@ if(user){
 // @access public
 
 const loginUser = asyncHandler(async(req,res) => {
-    const {email, password} = req.body;
-    if(!email || !password){
+    const {username, password} = req.body;
+    if(!username || !password){
         res.status(400);
         throw new Error("All field are manadatory");
     }
-    const user = await User.findOne({email});
+    const user = await User.findOne({username});
 
     //compare password
     if(user && (await bcrypt.compare(password, user.password)))
@@ -70,7 +71,7 @@ const loginUser = asyncHandler(async(req,res) => {
             res.status(200).json({accessToken});
         }else{
             res.status(401);
-            throw new Eror("Email or password is not valid");
+            throw new Error("Email or password is not valid");
         }
      });
 

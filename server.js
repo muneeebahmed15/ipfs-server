@@ -21,7 +21,7 @@ const port = process.env.PORT || 5000;
 
 app.use(express.json());
 
-app.use("/contacts", require ("./routes/contactRoutes"));
+app.use("/patientinfo", require ("./routes/patientInfoRoutes"));
 app.use("/users", require ("./routes/userRoutes"));
 
 app.use(errorHandler);
