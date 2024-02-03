@@ -1,53 +1,36 @@
 const mongoose = require("mongoose");
 
 const patientInfoSchema = mongoose.Schema ({
-    admin_id:{
-        type : mongoose.Schema.Types.ObjectId,
-        required : true,
-        ref : "User",
-    },
-    fullname:{
-        type: String,
-        required : [true, "Please add the patient name"],
-    },
-    fathername:{
-        type: String,
-        required : [true, "Please add the patient father name"],
-    },
-    CNIC:{
-        type: String,
-        required : [true, "Please add the patient CNIC"],
-    },
-    DOB:{
-        type: Date,
-        required : [true, "Please add the patient DOB"],
-    },
-    email:{
-        type: String,
-        required : [true, "Please add the patient email"],
-        unique : [true, "Email address already taken"],   
-    },
-    gender:{
-        type: String,
-        required : [true, "Please add the patient gender"],
-    },
-    phone:{
-        type: String,
-        required : [true, "Please add the patient phone number"],
-    },
-    username:{
-        type: String,
-        required : [true, "Please add the patient username"],
-        unique : [true, "Username address already taken"],   
-    },
-    password:{
-        type: String,
-        required : [true, "Please add the password for patient login"],
-    },
+    admin_id:{ type : mongoose.Schema.Types.ObjectId,  required : true, ref : "Admin" },
+    
+  // doctor_id:{ type : mongoose.Schema.Types.ObjectId,  required : true, ref : "Admin" },
+    
+    role:{ type: String, enum : ['patient' ] },
+     
+    fullname:{ type: String, required : true },
+
+    fathername:{ type: String, required : true },
+
+    CNIC:{ type: String, required : true },
+
+    DOB:{ type: Date, required : true },
+
+    email:{ type: String, required : true, unique : true },
+
+    gender:{ type: String,  required : true },
+
+    phone:{ type: String, required : true },
+
+    username:{ type: String, required : true, unique : true },
+
+    password:{ type: String, required : true },
+
+    healthRecord : [{ type: mongoose.Schema.Types.ObjectId, ref:"PatientHealth" }]
 },
     {
         timestamps: true,
     }    
 );
 
-module.exports = mongoose.model("PatientInfo", patientInfoSchema);
+const PatientInfo = mongoose.model("PatientInfo", patientInfoSchema);
+module.exports = PatientInfo;

@@ -1,17 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const {getPatientInfos, createPatientInfo,
-getPatientInfo, updtePatientInfo, deletePatientInfo} = require("../controllers/patientInfoController");
-const validateToken = require("../middleware/validateTokenHandler");
+getPatientInfo, updtePatientInfo, deletePatientInfo, addPatientHealthRecord} = require("../controllers/patientInfoController");
+const {validateToken, isAdmin} = require("../middleware/validateTokenHandler");
 
 
 router.use(validateToken);
 
-router.get("/",getPatientInfos);
+router.get("/get-all-patients",validateToken, isAdmin,getPatientInfos);
 
-router.post("/createpatientlogin",createPatientInfo);
+router.post("/register-patient", validateToken, isAdmin,createPatientInfo);
 
-router.get("/:id",getPatientInfo);
+router.get("/get-single-patient/:_id",validateToken, isAdmin, getPatientInfo);
+
+router.post("/add-health-record",validateToken, isAdmin, addPatientHealthRecord);
 
 router.put("/:id",updtePatientInfo);
 
