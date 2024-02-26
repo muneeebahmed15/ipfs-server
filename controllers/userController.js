@@ -58,13 +58,13 @@ const loginUser = asyncHandler(async(req,res) => {
     //compare password
     if(user && (await bcrypt.compare(password, user.password)))
         {
-            const accessToken = jwt.sign({
+            const token = jwt.sign({
                 user:{
                     email : user.email,
                     id : user.id,}, },
             process.env.ACCESS_TOKEN_SECRET );
            
-            res.status(200).json({accessToken});
+            res.status(200).json({token, user});
         }else{
             res.status(401).json("Email or password is not valid");
         }
@@ -78,7 +78,7 @@ const currentUser = asyncHandler(async(req,res) => {
     try {
         const _user = await Admin.findOne({ _id: req.user.id });
         if (_user) {
-          return res.status(200).json({ ok: true });
+          return res.status(200).json({ _user });
         }
       } catch (error) {
         next(error);

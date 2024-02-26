@@ -6,10 +6,10 @@ const cors = require("cors");
 
 
 
-// const corsOptions = {
-//     // origin: 'http://localhost:3000', // Replace with the actual origin of your React app
-//     optionsSuccessStatus: 200,
-// };
+const corsOptions = {
+    origin: 'http://localhost:3000', // Replace with the actual origin of your React app
+    optionsSuccessStatus: 200,
+};
 
 
 connectDB();
@@ -17,7 +17,7 @@ connectDB();
 const app = express();
 
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 const port = process.env.PORT || 5000;
 
 

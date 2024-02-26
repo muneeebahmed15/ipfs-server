@@ -11,8 +11,6 @@ const validateToken = asyncHandler(async(req, res, next) =>{
      if(authHeader && authHeader.startsWith("Bearer")){
         token = authHeader.split(" ")[1];
       
-     console.log("here is the token from validateTokenHandler", token);
-
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET,(err,decoded) =>{
             if(err){
                 res.status(401);
@@ -23,8 +21,7 @@ const validateToken = asyncHandler(async(req, res, next) =>{
         });
     }
         else{
-            res.status(403)
-            throw new Error("Forbidden from tokenhandler");
+            res.status(403).json({error:"Forbidden from tokenhandler"});
         }
     
 });
