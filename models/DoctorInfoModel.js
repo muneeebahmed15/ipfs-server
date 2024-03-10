@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const doctorInfoSchema = mongoose.Schema ({
-    Admin_id:{ type : mongoose.Schema.Types.ObjectId,  required : true, ref : "Admin" },
+    admin_id:{ type : mongoose.Schema.Types.ObjectId,  required : true, ref : "Admin" },
     
     role:{ type: String, enum : ['doctor' ] },
     
@@ -9,7 +9,7 @@ const doctorInfoSchema = mongoose.Schema ({
 
     fathername:{ type: String, required : true },
 
-    CNIC:{ type: String, required : true },
+    CNIC:{ type: String, required : true, unique : true },
 
     DOB:{ type: Date, required : true },
 

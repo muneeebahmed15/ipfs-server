@@ -64,7 +64,7 @@ const isPatient = async(req, res, next)=>{
             return next(errorHandler(401, "Not Allowed"))
         }
         else{
-            next()
+            next();
         }
     } catch (error) {
         console.log(error);

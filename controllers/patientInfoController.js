@@ -139,20 +139,13 @@ const addPatientHealthRecord = async (req, res, next) => {
       const { patient_id, doctor_id, problem, suggestion, futureVisit } = req.body;
 
       if (!patient_id || !doctor_id || !problem || !suggestion || !futureVisit) {
-          return res.status(400).json({ error: "Invalid inputs" });
-      }
-
-      const admin_id = req.user.id;
-      const user = await Admin.findById(admin_id);
-
-      if (!user) {
-          return res.status(400).json({ error: "Admin not found" });
+          return res.status(400).json({ error: "All fields are manadatory" });
       }
 
       const newHealthRecord = new PatientHealth({
           patient_id,
           doctor_id,
-          admin_id,
+          admin_id : req.user.id,
           problem,
           suggestion,
           futureVisit,
@@ -164,14 +157,13 @@ const addPatientHealthRecord = async (req, res, next) => {
       const patient = await PatientInfo.findById(patient_id);
 
       if (!patient) {
-          return res.status(400).json({ error: "Patient not found" });
+          return res.status(404).json({ error: "Patient not found" });
       }
 
       patient.healthRecord.push(savedHealthRecord._id);
       await patient.save();
 
       return res.status(200).json({
-          ok: true,
           healthRecord: savedHealthRecord,
       });
   } catch (error) {

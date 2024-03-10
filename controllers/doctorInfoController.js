@@ -6,67 +6,90 @@ const jwt = require("jsonwebtoken");
 
 const registerDoctor = asyncHandler(async(req,res)=>{
     const {fullname, fathername,  CNIC, DOB,  email,  gender,  phone, username,  password, role}= req.body;
-    console.log(req.body);
+    
 
     if(!fullname || !fathername || !CNIC || !DOB || !email || !gender || !phone || !username || !password || !role){
         res.status(400).json({error:"All field are mandatory!"});
     }
     const userAvailable = await DoctorInfo.findOne({email});
+    const userCNIC = await DoctorInfo.findOne({CNIC});
     
 if(userAvailable)
 {
-    // console.log("user registered")
-    res.status(400).json("User already registered");
+    res.status(409).json("User already registered");
+}else if(userCNIC){
+    res.status(409).json("User already registered");
 }
-
-//hash password
+else{
 const hashedPassword = await bcrypt.hash(password,10);
-// console.log("hashpassword", hashedPassword);
-
 
     const doctorinfo = await DoctorInfo.create({
-        fullname, fathername, CNIC, DOB, email, gender, phone, username, password: hashedPassword, role ,Admin_id : req.user.id
+        fullname, fathername, CNIC, DOB, email, gender, phone, username, password: hashedPassword, role ,admin_id : req.user.id
     });
-    console.log("user created")
     
     if(doctorinfo){
-        res.status(201).json({msg:"Doctor Credentials created successfully" })
+        res.status(200).json({msg:"Doctor Credentials created successfully" })
     }
     else{
         res.status(400).json({msg:"User data is not valid"});
     }
-
+}
 });
 
 
 
-const loginDoctor = asyncHandler(async(req,res) => {
-    const {email, password} = req.body;
+const loginDoctor = asyncHandler(async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-    if(!email || !password){
-        res.status(400).json({error:"All field are manadatory"});
-    }
-    const user = await DoctorInfo.findOne({ email });
-    if(!user){
-        res.status(404).json({error:"User not found"});
-    }
-
-    //compare password
-    if(user && (await bcrypt.compare(password, user.password)))
-        {
-            const token = jwt.sign({
-                user:{
-                    email : user.email,
-                    id : user.id,}, },
-            process.env.ACCESS_TOKEN_SECRET );
-           
-            res.status(200).json({token, user});
-        }else{
-            res.status(401).json({error:"Email or password is not valid"});
+        if (!email || !password) {
+            return res.status(400).json({ error: "All fields are mandatory" });
         }
-     });
 
+        const user = await DoctorInfo.findOne({ email });
 
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Compare password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (isPasswordValid) {
+            const token = jwt.sign(
+                {
+                    user: {
+                        email: user.email,
+                        id: user.id,
+                    },
+                },
+                process.env.ACCESS_TOKEN_SECRET
+            );
+
+            return res.status(200).json({ token, user });
+        } else {
+            return res.status(401).json({ error: "Email or password is not valid" });
+        }
+    } catch (error) {
+        console.error("Error in loginDoctor:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
+const AllDoctor = async(req, res) =>{
+
+   try {
+     const AllDoctor = await DoctorInfo.find()
+
+     if(AllDoctor){
+        res.status(200).json(AllDoctor);
+     }else{
+        res.status(404).json({msg:"No doctor found"})
+     }
+   } catch (error) {
+        res.status(500).json({error:"Internal server error"})
+   }
+}
      
      const currentUser = asyncHandler(async(req,res) => {
         try {
@@ -79,4 +102,4 @@ const loginDoctor = asyncHandler(async(req,res) => {
           }
     });
 
-module.exports = {registerDoctor, loginDoctor, currentUser}
+module.exports = {registerDoctor, loginDoctor, AllDoctor, currentUser}
