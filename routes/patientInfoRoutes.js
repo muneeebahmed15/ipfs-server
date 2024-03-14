@@ -8,7 +8,9 @@ loginPatient,
 currentUser, 
 loadUser,
 updatePassword,
-GetHealthRecord} = require("../controllers/patientInfoController");
+GetHealthRecord,
+searchPatients,
+getAllHealthRecord} = require("../controllers/patientInfoController");
 
  const {validateToken, isAdmin, isDoctor, isPatient} = require("../middleware/validateTokenHandler");
 
@@ -36,6 +38,8 @@ router.get("/get-patient-by-name/:name",validateToken,  getPatientByName);
 router.get("/load-user/:_id",validateToken, loadUser);
 
 router.put("/update-password",validateToken, updatePassword);
+
+router.get("/get-all-health-record", validateToken, getAllHealthRecord);
 
 
 

@@ -11,7 +11,7 @@ const Admin = require("../models/adminModel");
 // @access private
 
 const getPatientInfos = asyncHandler(async(req,res) => {
-    const patientinfo = await PatientInfo.find();
+    const patientinfo = await PatientInfo.find().populate("healthRecord");
     res.status(200).json(patientinfo);
 });
 
@@ -304,9 +304,6 @@ const loginPatient = asyncHandler(async(req,res) => {
 
     }
 
- 
-
-
     const updatePassword = async (req, res) => {
   // Get the user's current password from the request body
   const { currentPassword, newPassword } = req.body;
@@ -340,9 +337,63 @@ const loginPatient = asyncHandler(async(req,res) => {
   
 };
 
+const searchPatients = async (req, res) => {
+    try {
+    //   const { query } = req.query;
+  
+    //   // Use a regular expression for a case-insensitive search on multiple fields
+    //   const searchResults = await PatientInfo.find({
+    //     $or: [
+    //       { fullname: { $regex: new RegExp(query, 'i') } },
+    //       { CNIC: { $regex: new RegExp(query, 'i') } },
+    //       { fathername: { $regex: new RegExp(query, 'i') } },
+    //       { city: { $regex: new RegExp(query, 'i') } },
+    //     ],
+    //   });
+
+    const { query } = req.query;
+
+    // Define the fields to search in
+    const searchFields = ['fullname', 'CNIC', 'fathername', 'city'];
+
+    // Build a dynamic $or query based on the specified fields
+    const orQuery = searchFields.map(field => ({ [field]: { $regex: new RegExp(query, 'i') } }));
+    
+    // Use $or to combine multiple conditions
+    const searchResults = await PatientInfo.find({ $or: orQuery });
+
+      if(searchResults.length>0){
+  
+      res.status(200).json({ results: searchResults });
+
+    }else{
+        res.status(404).json({error: "Patient not found"})
+    }
+    } catch (error) {
+      console.error('Error searching patients:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  };
+
+const getAllHealthRecord = async (req, res) =>{
+
+   try {
+
+    const HealthRecord = await PatientHealth.find().populate("patient_id");
+
+    res.status(200).json({HealthRecord});
+
+   } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+
+   }
+}
 
 
-module.exports = {getPatientInfos,
+module.exports = { getAllHealthRecord,
+                    searchPatients,
+                getPatientInfos,
                 getPatientByName,
                  getPatientByCnic,
                   createPatientInfo, 
